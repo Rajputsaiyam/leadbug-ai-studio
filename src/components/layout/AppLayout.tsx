@@ -6,7 +6,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
     <div className="min-h-screen bg-background">
       <Sidebar />
       <TopNav />
-      <main className="ml-[60px] mt-[56px] p-6">
+      <main className="ml-[240px] mt-[56px] p-6">
         {children}
       </main>
     </div>

@@ -13,7 +13,7 @@ const TopNav = () => {
   const location = useLocation();
 
   return (
-    <div className="fixed top-0 left-[60px] right-0 h-[56px] bg-card border-b border-crm-border flex items-center px-4 z-40">
+    <div className="fixed top-0 left-[240px] right-0 h-[56px] bg-card border-b border-crm-border flex items-center px-4 z-40">
       {/* Logo */}
       <div className="flex items-center gap-2 min-w-[180px]">
         <div className="w-7 h-7 bg-crm-blue rounded-md flex items-center justify-center">
