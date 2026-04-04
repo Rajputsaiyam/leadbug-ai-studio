@@ -16,6 +16,9 @@ import CreateSequence from "./pages/CreateSequence";
 import Chatbot from "./pages/Chatbot";
 import Inbox from "./pages/Inbox";
 import Contacts from "./pages/Contacts";
+import LandingHome from "./pages/landing/LandingHome";
+import LandingFeatures from "./pages/landing/LandingFeatures";
+import LandingPricing from "./pages/landing/LandingPricing";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +29,11 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          
+          {/* Landing pages */}
+          <Route path="/landing" element={<LandingHome />} />
+          <Route path="/landing/features" element={<LandingFeatures />} />
+          <Route path="/landing/pricing" element={<LandingPricing />} />
           
           {/* Onboarding - No shell */}
           <Route path="/onboarding" element={<AuthLayout><OnboardingLanding /></AuthLayout>} />
