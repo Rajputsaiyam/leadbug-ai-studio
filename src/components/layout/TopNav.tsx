@@ -1,5 +1,6 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { Bell } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const navTabs = [
   { label: "Dashboard", path: "/dashboard" },
@@ -11,10 +12,10 @@ const navTabs = [
 const TopNav = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth();
 
   return (
-    <div className="fixed top-0 left-[240px] right-0 h-[56px] bg-card border-b border-crm-border flex items-center px-4 z-40">
-      {/* Logo */}
+    <div className="fixed top-0 left-[240px] right-0 h-[56px] bg-card border-b border-border flex items-center px-4 z-40">
       <div className="flex items-center gap-2 min-w-[180px]">
         <div className="w-7 h-7 bg-crm-blue rounded-md flex items-center justify-center">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -24,7 +25,6 @@ const TopNav = () => {
         <span className="font-bold text-sm text-foreground">LeadBug CRM</span>
       </div>
 
-      {/* Center Nav Tabs */}
       <div className="flex-1 flex justify-center">
         <div className="bg-crm-blue rounded-full flex items-center px-1 py-1 gap-0.5">
           {navTabs.map((tab) => {
@@ -46,10 +46,9 @@ const TopNav = () => {
         </div>
       </div>
 
-      {/* Right side */}
       <div className="flex items-center gap-3 min-w-[320px] justify-end">
         <span className="text-xs text-muted-foreground">Available Credits: 0</span>
-        <button className="text-xs border border-crm-border rounded-full px-3 py-1.5 text-foreground hover:bg-muted transition-colors">
+        <button onClick={() => navigate("/settings")} className="text-xs border border-border rounded-full px-3 py-1.5 text-foreground hover:bg-muted transition-colors">
           My Profile
         </button>
         <button className="text-xs text-crm-blue hover:underline">Refer and Earn</button>

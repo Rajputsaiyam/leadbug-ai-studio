@@ -1,10 +1,12 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { AuthProvider } from "@/contexts/AuthContext";
+import ProtectedRoute from "@/components/ProtectedRoute";
 import AppLayout from "@/components/layout/AppLayout";
 import AuthLayout from "@/components/layout/AuthLayout";
-import Index from "./pages/Index";
+import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import OnboardingLanding from "./pages/onboarding/OnboardingLanding";
 import OnboardingWizard from "./pages/onboarding/OnboardingWizard";
@@ -19,6 +21,7 @@ import Contacts from "./pages/Contacts";
 import LandingHome from "./pages/landing/LandingHome";
 import LandingFeatures from "./pages/landing/LandingFeatures";
 import LandingPricing from "./pages/landing/LandingPricing";
+import Settings from "./pages/Settings";
 
 const queryClient = new QueryClient();
 
@@ -27,30 +30,34 @@ const App = () => (
     <TooltipProvider>
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          
-          {/* Landing pages */}
-          <Route path="/landing" element={<LandingHome />} />
-          <Route path="/landing/features" element={<LandingFeatures />} />
-          <Route path="/landing/pricing" element={<LandingPricing />} />
-          
-          {/* Onboarding - No shell */}
-          <Route path="/onboarding" element={<AuthLayout><OnboardingLanding /></AuthLayout>} />
-          <Route path="/onboarding/setup" element={<AuthLayout><OnboardingWizard /></AuthLayout>} />
-          
-          {/* Main app - With shell */}
-          <Route path="/dashboard" element={<AppLayout><Dashboard /></AppLayout>} />
-          <Route path="/templates" element={<AppLayout><Templates /></AppLayout>} />
-          <Route path="/templates/new" element={<AppLayout><NewTemplate /></AppLayout>} />
-          <Route path="/sequences" element={<AppLayout><Sequences /></AppLayout>} />
-          <Route path="/sequences/new" element={<AppLayout><CreateSequence /></AppLayout>} />
-          <Route path="/chatbot" element={<AppLayout><Chatbot /></AppLayout>} />
-          <Route path="/inbox" element={<AppLayout><Inbox /></AppLayout>} />
-          <Route path="/contacts" element={<AppLayout><Contacts /></AppLayout>} />
-          
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            <Route path="/" element={<Navigate to="/landing" replace />} />
+            <Route path="/login" element={<Login />} />
+
+            {/* Landing pages */}
+            <Route path="/landing" element={<LandingHome />} />
+            <Route path="/landing/features" element={<LandingFeatures />} />
+            <Route path="/landing/pricing" element={<LandingPricing />} />
+
+            {/* Onboarding */}
+            <Route path="/onboarding" element={<ProtectedRoute><AuthLayout><OnboardingLanding /></AuthLayout></ProtectedRoute>} />
+            <Route path="/onboarding/setup" element={<ProtectedRoute><AuthLayout><OnboardingWizard /></AuthLayout></ProtectedRoute>} />
+
+            {/* Main app */}
+            <Route path="/dashboard" element={<ProtectedRoute><AppLayout><Dashboard /></AppLayout></ProtectedRoute>} />
+            <Route path="/templates" element={<ProtectedRoute><AppLayout><Templates /></AppLayout></ProtectedRoute>} />
+            <Route path="/templates/new" element={<ProtectedRoute><AppLayout><NewTemplate /></AppLayout></ProtectedRoute>} />
+            <Route path="/sequences" element={<ProtectedRoute><AppLayout><Sequences /></AppLayout></ProtectedRoute>} />
+            <Route path="/sequences/new" element={<ProtectedRoute><AppLayout><CreateSequence /></AppLayout></ProtectedRoute>} />
+            <Route path="/chatbot" element={<ProtectedRoute><AppLayout><Chatbot /></AppLayout></ProtectedRoute>} />
+            <Route path="/inbox" element={<ProtectedRoute><AppLayout><Inbox /></AppLayout></ProtectedRoute>} />
+            <Route path="/contacts" element={<ProtectedRoute><AppLayout><Contacts /></AppLayout></ProtectedRoute>} />
+            <Route path="/settings" element={<ProtectedRoute><AppLayout><Settings /></AppLayout></ProtectedRoute>} />
+
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
