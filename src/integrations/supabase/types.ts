@@ -14,7 +14,348 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      chatbot_sessions: {
+        Row: {
+          created_at: string
+          escalated: boolean | null
+          id: string
+          session_key: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          escalated?: boolean | null
+          id?: string
+          session_key: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          escalated?: boolean | null
+          id?: string
+          session_key?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      contacts: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          name: string
+          notes: string | null
+          phone: string | null
+          source: string | null
+          tags: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          phone?: string | null
+          source?: string | null
+          tags?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          source?: string | null
+          tags?: string[] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      conversations: {
+        Row: {
+          contact_id: string | null
+          contact_name: string | null
+          created_at: string
+          id: string
+          last_message: string | null
+          last_message_at: string | null
+          unread_count: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          contact_id?: string | null
+          contact_name?: string | null
+          created_at?: string
+          id?: string
+          last_message?: string | null
+          last_message_at?: string | null
+          unread_count?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          contact_id?: string | null
+          contact_name?: string | null
+          created_at?: string
+          id?: string
+          last_message?: string | null
+          last_message_at?: string | null
+          unread_count?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          read: boolean | null
+          sender: string
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          read?: boolean | null
+          sender: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          read?: boolean | null
+          sender?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          company: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+          industry: string | null
+          phone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          company?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          industry?: string | null
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          company?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          industry?: string | null
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      sequence_steps: {
+        Row: {
+          active: boolean | null
+          created_at: string
+          day: number | null
+          id: string
+          send_time: string | null
+          sequence_id: string
+          sort_order: number | null
+          template_name: string
+          timezone: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string
+          day?: number | null
+          id?: string
+          send_time?: string | null
+          sequence_id: string
+          sort_order?: number | null
+          template_name?: string
+          timezone?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string
+          day?: number | null
+          id?: string
+          send_time?: string | null
+          sequence_id?: string
+          sort_order?: number | null
+          template_name?: string
+          timezone?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sequence_steps_sequence_id_fkey"
+            columns: ["sequence_id"]
+            isOneToOne: false
+            referencedRelation: "sequences"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sequences: {
+        Row: {
+          active: boolean | null
+          attempted: number | null
+          category: string | null
+          channel: string | null
+          created_at: string
+          delivered_pct: string | null
+          fallback: string | null
+          from_number: string | null
+          id: string
+          name: string
+          retries: boolean | null
+          schedule_date: string | null
+          schedule_type: string | null
+          sent_pct: string | null
+          status: string | null
+          type: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean | null
+          attempted?: number | null
+          category?: string | null
+          channel?: string | null
+          created_at?: string
+          delivered_pct?: string | null
+          fallback?: string | null
+          from_number?: string | null
+          id?: string
+          name: string
+          retries?: boolean | null
+          schedule_date?: string | null
+          schedule_type?: string | null
+          sent_pct?: string | null
+          status?: string | null
+          type?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean | null
+          attempted?: number | null
+          category?: string | null
+          channel?: string | null
+          created_at?: string
+          delivered_pct?: string | null
+          fallback?: string | null
+          from_number?: string | null
+          id?: string
+          name?: string
+          retries?: boolean | null
+          schedule_date?: string | null
+          schedule_type?: string | null
+          sent_pct?: string | null
+          status?: string | null
+          type?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      templates: {
+        Row: {
+          body: string
+          button_type: string | null
+          category: string
+          clicked_count: number | null
+          created_at: string
+          delivered_count: number | null
+          footer: string | null
+          header: string | null
+          id: string
+          name: string
+          opened_count: number | null
+          sent_count: number | null
+          status: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body?: string
+          button_type?: string | null
+          category?: string
+          clicked_count?: number | null
+          created_at?: string
+          delivered_count?: number | null
+          footer?: string | null
+          header?: string | null
+          id?: string
+          name: string
+          opened_count?: number | null
+          sent_count?: number | null
+          status?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          button_type?: string | null
+          category?: string
+          clicked_count?: number | null
+          created_at?: string
+          delivered_count?: number | null
+          footer?: string | null
+          header?: string | null
+          id?: string
+          name?: string
+          opened_count?: number | null
+          sent_count?: number | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
