@@ -83,7 +83,7 @@ const Inbox = () => {
     const msgChannel = supabase
       .channel("inbox-messages")
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, (payload) => {
-        const newMsg = payload.new as Message;
+        const newMsg = payload.new as any;
         if (activeConv && newMsg.conversation_id === activeConv.id) {
           setMessages(prev => [...prev, { id: newMsg.id, sender: newMsg.sender, content: newMsg.content, created_at: newMsg.created_at, read: newMsg.read ?? false }]);
         }
