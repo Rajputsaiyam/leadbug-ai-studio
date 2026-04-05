@@ -1,63 +1,71 @@
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
-
-const responses: Record<string, string> = {
-  hello: "Hello! Welcome to LeadBug CRM. How can I help you today?",
-  hi: "Hi there! I'm the LeadBug AI assistant. What can I do for you?",
-  help: "I can help you with:\n• Creating WhatsApp templates\n• Setting up campaigns\n• Managing contacts\n• Understanding analytics\n\nWhat would you like to know more about?",
-  template: "To create a template, go to Templates → Create Templates. You can use our AI generator to create professional templates quickly. Would you like me to guide you through it?",
-  campaign: "To start a campaign:\n1. Create a template first\n2. Go to Sequences → Create Sequence\n3. Add your template and recipients\n4. Schedule and send!\n\nNeed help with any step?",
-  contact: "You can manage contacts in the Contact Hub. Add contacts manually, import from CSV, or they'll be added automatically from WhatsApp conversations.",
-  price: "LeadBug offers flexible pricing plans starting from ₹999/month. Visit our Pricing page for detailed information.",
-  agent: "I'll connect you to a human agent right away. Please hold on...",
-  human: "I'll connect you to a human agent right away. Please hold on...",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
-  }
+  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { message, sessionId } = await req.json();
-    
-    if (!message || typeof message !== "string") {
-      return new Response(JSON.stringify({ error: "Message is required" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+    const { messages } = await req.json();
+    if (!messages || !Array.isArray(messages)) {
+      return new Response(JSON.stringify({ error: "Messages array is required" }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const lowerMsg = message.toLowerCase().trim();
-    
-    // Check for escalation keywords
-    const escalationKeywords = ["agent", "human", "person", "speak to someone", "real person", "escalate"];
-    const escalated = escalationKeywords.some(k => lowerMsg.includes(k));
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
-    // Find best matching response
-    let reply = "Thank you for your message! I'm here to help with anything related to LeadBug CRM - templates, campaigns, contacts, and more. What would you like to know?";
-    
-    for (const [key, value] of Object.entries(responses)) {
-      if (lowerMsg.includes(key)) {
-        reply = value;
-        break;
-      }
+    const systemPrompt = `You are the LeadBug CRM AI assistant — a friendly, knowledgeable support bot for a WhatsApp CRM platform.
+
+You help users with:
+- Creating and managing WhatsApp message templates
+- Setting up automated sequences/campaigns
+- Managing contacts and contact lists
+- Understanding analytics and delivery metrics
+- Navigating the CRM dashboard
+- Best practices for WhatsApp Business messaging
+
+RULES:
+- Be concise but helpful
+- Use markdown formatting for better readability
+- If the user wants to speak to a human agent, respond with exactly: [ESCALATE]
+- Stay on topic — you only help with LeadBug CRM features
+- Suggest next steps when appropriate`;
+
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-3-flash-preview",
+        messages: [
+          { role: "system", content: systemPrompt },
+          ...messages,
+        ],
+        stream: true,
+      }),
+    });
+
+    if (!response.ok) {
+      const status = response.status;
+      if (status === 429) return new Response(JSON.stringify({ error: "Rate limited. Please try again." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      if (status === 402) return new Response(JSON.stringify({ error: "AI credits exhausted." }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      throw new Error(`AI gateway error: ${status}`);
     }
 
-    // Add delay to simulate thinking
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    return new Response(JSON.stringify({ reply, escalated }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    return new Response(response.body, {
+      headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
     });
   } catch (error) {
+    console.error("chatbot error:", error);
     return new Response(JSON.stringify({ error: "Chatbot error" }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 });
